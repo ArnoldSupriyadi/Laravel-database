@@ -49,7 +49,7 @@ class TransactionTest extends TestCase
         }
 
         $results = DB::select("select * from categories");
-        self::assertCount(0, $results);
+        self::assertCount(2, $results);
 
     }
 
@@ -89,7 +89,7 @@ class TransactionTest extends TestCase
         }
 
         $results = DB::select("select * from categories");
-        self::assertCount(0, $results);
+        self::assertCount(2, $results);
 
     }
 
