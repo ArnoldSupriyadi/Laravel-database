@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
+use function PHPUnit\Framework\assertCount;
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertNotNull;
 
@@ -122,5 +123,49 @@ class QueryBuilderTest extends TestCase
         for ($i = 0; $i < count($collection); $i++){
             Log::info(json_encode($collection[$i]));
         }
+    }
+
+    public function testUpdate()
+    {
+        $this->insertCategories();
+
+        DB::table('categories')->where("id", "=", "SMARTPHONE")->update([
+            'name' => 'Handphone'
+        ]);
+
+        $collection = DB::table("categories")->where("name", "=", "Handphone")->get();
+        assertCount(1, $collection);
+        for ($i = 0; $i < count($collection); $i++){
+            Log::info(json_encode($collection[$i]));
+        }
+    }
+
+    public function testUpsert()
+    {
+        DB::table("categories")->updateOrInsert([
+            'id' => 'VOUCHER'
+        ], [
+            'name' => 'Voucher',
+            'description' => 'Ticket and Voucher',
+            'created_at' => '2020-10-10 10:10:10'
+        ]);
+
+        $collection = DB::table("categories")->where('id', '=', 'VOUCHER')->get();
+        self::assertCount(1, $collection);
+        for ($i = 0; $i < count($collection); $i++){
+            Log::info(json_encode($collection[$i]));
+        }
+    }
+
+    public function testIncrement()
+    {
+
+        DB::table("counters")->where('id', '=', 'sample')->increment('counter', 1);
+
+        $collection = DB::table("counters")->where('id', '=', 'sample')->get();
+        self::assertCount(1, $collection);
+        $collection->each(function ($item) {
+            Log::info(json_encode($item));
+        });
     }
 }
