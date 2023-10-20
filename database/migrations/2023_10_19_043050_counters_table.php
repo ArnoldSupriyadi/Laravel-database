@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->string('id');
-            $table->string('name', 100);
-            $table->text('description')->nullable();
-            $table->timestamps();
+        Schema::create('counters', function (Blueprint $table) {
+            $table->string('id')->nullable();
+            $table->integer('counter')->nullable();
+            $table->timestamps(); // Kolom created_at dan updated_at
         });
     }
 
@@ -24,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        //
     }
 };
