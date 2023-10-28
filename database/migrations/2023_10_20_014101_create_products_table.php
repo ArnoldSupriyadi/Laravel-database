@@ -18,6 +18,8 @@ return new class extends Migration
             $table->integer('price')->nullable();
             $table->string('category_id');
             $table->timestamps();
+
+            // $table->foreign("category_id")->references("id")->on("categories");
         });
     }
 

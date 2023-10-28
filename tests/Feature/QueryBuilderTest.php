@@ -377,4 +377,83 @@ class QueryBuilderTest extends TestCase
 
         self::assertCount(0, $collection);
     }
+
+    public function testLocking()
+    {
+        $this->insertProducts();
+
+        DB::transaction(function (){
+            $collection = DB::table("products")
+                ->where('id', '=', '1')
+                ->lockForUpdate()
+                ->get();
+
+            self::assertCount(1, $collection);
+        });
+
+        
+    }
+
+    public function testPagination()
+    {
+        $this->insertCategories();
+
+        $paginate = DB::table('categories')->paginate(perPage: 2, page: 2);
+
+        self::assertEquals(2, $paginate->currentPage());
+        self::assertEquals(2, $paginate->perPage());
+        self::assertEquals(2, $paginate->lastPage());
+        self::assertEquals(4, $paginate->total());
+
+        $collection = $paginate->items();
+        self::assertCount(2, $collection);
+        foreach ($collection as $item) {
+            Log::info(json_encode($item));
+        }
+
+    }
+
+    public function testIterateAllPagination()
+    {
+        $this->insertCategories();
+
+        $page = 1;
+
+        while(true) {
+            $paginate = DB::table("categories")->paginate(perPage: 2, page: $page);
+
+            if($paginate->isEmpty()) {
+                break;
+            } else {
+                $page++;
+
+                $collection = $paginate->items();
+                self::assertCount(2, $collection);
+                foreach ($collection as $item) {
+                    Log::info(json_encode($item));
+                }
+            }
+        }
+    }
+
+    public function testCursorPagination()
+    {
+        $this->insertCategories();
+
+        $cursor = "id";
+        while(true) {
+            $paginate = DB::table("categories")->orderBy("id")->cursorPaginate(perPage: 2, cursor: $cursor);
+
+            foreach ($paginate->items() as $item) {
+                self::assertNotNull($item);
+                Log::info(json_encode($item));
+            }
+
+            $cursor = $paginate->nextCursor();
+            if($cursor == null) {
+                break;
+            }
+        }
+    }
+
 }
